@@ -55,11 +55,13 @@ export function useLogin() {
 			// Invalidate and refetch profile
 			queryClient.invalidateQueries({ queryKey: authKeys.profile() });
 
-			// Redirect to dashboard or home
+			// Redirect to dashboard or home only on success
 			navigate({ to: "/" });
 		},
 		onError: (error) => {
+			// Don't redirect on error - let the UI show the error message
 			console.error("Login failed:", error);
+			// The error will be handled by the component's error handling
 		},
 	});
 }

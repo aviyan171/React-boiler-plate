@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { handleApiError, useLogin } from "../index";
+import { useAuthContext } from "../provider/AuthProvider";
 
 export function LoginForm() {
 	const [formData, setFormData] = useState({
@@ -8,12 +9,17 @@ export function LoginForm() {
 		password: "",
 	});
 	const [showPassword, setShowPassword] = useState(false);
+	const { login } = useAuthContext();
 
 	const loginMutation = useLogin();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		loginMutation.mutate(formData);
+		loginMutation.mutate(formData, {
+			onSuccess: (data) => {
+				login(data.accessToken, data.user);
+			},
+		});
 	};
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

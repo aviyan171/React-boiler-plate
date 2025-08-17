@@ -8,34 +8,14 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createFileRoute } from '@tanstack/react-router'
-
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
-import { Route as AuthRegisterImport } from './routes/auth/register'
-import { Route as AuthLoginImport } from './routes/auth/login'
-import { Route as AuthAuthImport } from './routes/auth/_auth'
-
-// Create Virtual Routes
-
-const AuthImport = createFileRoute('/auth')()
+import { Route as ProtectedRegisterImport } from './routes/_protected/register'
+import { Route as ProtectedLoginImport } from './routes/_protected/login'
 
 // Create/Update Routes
-
-const AuthRoute = AuthImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const AboutRoute = AboutImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -43,21 +23,16 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthRegisterRoute = AuthRegisterImport.update({
-  id: '/register',
+const ProtectedRegisterRoute = ProtectedRegisterImport.update({
+  id: '/_protected/register',
   path: '/register',
-  getParentRoute: () => AuthRoute,
+  getParentRoute: () => rootRoute,
 } as any)
 
-const AuthLoginRoute = AuthLoginImport.update({
-  id: '/login',
+const ProtectedLoginRoute = ProtectedLoginImport.update({
+  id: '/_protected/login',
   path: '/login',
-  getParentRoute: () => AuthRoute,
-} as any)
-
-const AuthAuthRoute = AuthAuthImport.update({
-  id: '/_auth',
-  getParentRoute: () => AuthRoute,
+  getParentRoute: () => rootRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -71,112 +46,63 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutImport
-      parentRoute: typeof rootRoute
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthImport
-      parentRoute: typeof rootRoute
-    }
-    '/auth/_auth': {
-      id: '/auth/_auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthAuthImport
-      parentRoute: typeof AuthRoute
-    }
-    '/auth/login': {
-      id: '/auth/login'
+    '/_protected/login': {
+      id: '/_protected/login'
       path: '/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: typeof AuthLoginImport
-      parentRoute: typeof AuthImport
+      fullPath: '/login'
+      preLoaderRoute: typeof ProtectedLoginImport
+      parentRoute: typeof rootRoute
     }
-    '/auth/register': {
-      id: '/auth/register'
+    '/_protected/register': {
+      id: '/_protected/register'
       path: '/register'
-      fullPath: '/auth/register'
-      preLoaderRoute: typeof AuthRegisterImport
-      parentRoute: typeof AuthImport
+      fullPath: '/register'
+      preLoaderRoute: typeof ProtectedRegisterImport
+      parentRoute: typeof rootRoute
     }
   }
 }
 
 // Create and export the route tree
 
-interface AuthRouteChildren {
-  AuthAuthRoute: typeof AuthAuthRoute
-  AuthLoginRoute: typeof AuthLoginRoute
-  AuthRegisterRoute: typeof AuthRegisterRoute
-}
-
-const AuthRouteChildren: AuthRouteChildren = {
-  AuthAuthRoute: AuthAuthRoute,
-  AuthLoginRoute: AuthLoginRoute,
-  AuthRegisterRoute: AuthRegisterRoute,
-}
-
-const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
-
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/auth': typeof AuthAuthRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/register': typeof AuthRegisterRoute
+  '/login': typeof ProtectedLoginRoute
+  '/register': typeof ProtectedRegisterRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/auth': typeof AuthAuthRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/register': typeof AuthRegisterRoute
+  '/login': typeof ProtectedLoginRoute
+  '/register': typeof ProtectedRegisterRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/auth': typeof AuthRouteWithChildren
-  '/auth/_auth': typeof AuthAuthRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/register': typeof AuthRegisterRoute
+  '/_protected/login': typeof ProtectedLoginRoute
+  '/_protected/register': typeof ProtectedRegisterRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/auth' | '/auth/login' | '/auth/register'
+  fullPaths: '/' | '/login' | '/register'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/auth' | '/auth/login' | '/auth/register'
-  id:
-    | '__root__'
-    | '/'
-    | '/about'
-    | '/auth'
-    | '/auth/_auth'
-    | '/auth/login'
-    | '/auth/register'
+  to: '/' | '/login' | '/register'
+  id: '__root__' | '/' | '/_protected/login' | '/_protected/register'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
-  AuthRoute: typeof AuthRouteWithChildren
+  ProtectedLoginRoute: typeof ProtectedLoginRoute
+  ProtectedRegisterRoute: typeof ProtectedRegisterRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
-  AuthRoute: AuthRouteWithChildren,
+  ProtectedLoginRoute: ProtectedLoginRoute,
+  ProtectedRegisterRoute: ProtectedRegisterRoute,
 }
 
 export const routeTree = rootRoute
@@ -190,35 +116,18 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/about",
-        "/auth"
+        "/_protected/login",
+        "/_protected/register"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/about": {
-      "filePath": "about.tsx"
+    "/_protected/login": {
+      "filePath": "_protected/login.tsx"
     },
-    "/auth": {
-      "filePath": "auth",
-      "children": [
-        "/auth/_auth",
-        "/auth/login",
-        "/auth/register"
-      ]
-    },
-    "/auth/_auth": {
-      "filePath": "auth/_auth.tsx",
-      "parent": "/auth"
-    },
-    "/auth/login": {
-      "filePath": "auth/login.tsx",
-      "parent": "/auth"
-    },
-    "/auth/register": {
-      "filePath": "auth/register.tsx",
-      "parent": "/auth"
+    "/_protected/register": {
+      "filePath": "_protected/register.tsx"
     }
   }
 }

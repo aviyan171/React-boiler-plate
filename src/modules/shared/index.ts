@@ -11,6 +11,7 @@ export {
 
 // Export utilities
 export * from "./utils/errorHandler";
+export * from "./utils/storage";
 
 // Export enums
 export * from "./enums";

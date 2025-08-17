@@ -16,15 +16,24 @@ import type {
 export async function login(
 	credentials: LoginCredentials,
 ): Promise<AuthResponse> {
-	const response = await httpService.post<AuthResponse>(
-		API_ENDPOINTS.AUTH.LOGIN,
-		credentials,
-	);
+	try {
+		const response = await httpService.post<AuthResponse>(
+			API_ENDPOINTS.AUTH.LOGIN,
+			credentials,
+		);
 
-	// Store token automatically on successful login
-	httpService.setAuthToken(response.data.token);
+		// Only store token on successful login
+		httpService.setAuthToken(
+			response.data.accessToken,
+			response.data.refreshToken,
+		);
 
-	return response.data;
+		return response.data;
+	} catch (error) {
+		// Don't store token on failure - let the UI handle the error
+		console.error("Login failed:", error);
+		throw error; // Re-throw so the UI can handle it
+	}
 }
 
 /**
@@ -37,7 +46,10 @@ export async function register(userData: RegisterData): Promise<AuthResponse> {
 	);
 
 	// Store token automatically on successful registration
-	httpService.setAuthToken(response.data.token);
+	httpService.setAuthToken(
+		response.data.accessToken,
+		response.data.refreshToken,
+	);
 
 	return response.data;
 }
@@ -69,7 +81,7 @@ export async function refreshToken(
 	);
 
 	// Update token automatically on successful refresh
-	httpService.setAuthToken(response.data.token);
+	httpService.setAuthToken(response.data.accessToken);
 
 	return response.data;
 }

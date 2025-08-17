@@ -29,7 +29,7 @@ export interface User {
 
 export interface AuthResponse {
 	user: User;
-	token: string;
+	accessToken: string;
 	refreshToken: string;
 }
 
@@ -52,8 +52,7 @@ export interface LogoutResponse {
 }
 
 export interface RefreshTokenResponse {
-	token: string;
-	refreshToken?: string; // Backend might return new refresh token
+	accessToken: string;
 }
 
 export interface TokenInput {

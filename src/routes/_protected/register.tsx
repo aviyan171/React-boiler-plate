@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AuthCard, RegisterForm } from "../../modules/auth";
 
-export const Route = createFileRoute("/auth/register")({
+export const Route = createFileRoute("/_protected/register")({
 	component: RouteComponent,
 });
 

@@ -1,6 +1,7 @@
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import axios from "axios";
 import { environment } from "../config/environment";
+import { setLocalStorage } from "../utils/storage";
 import { HTTP_STATUS_CODES } from "./constants";
 import type { ApiError, ApiResponse } from "./types";
 
@@ -15,16 +16,13 @@ export class HttpClient {
 				"Content-Type": "application/json",
 			},
 		});
-
-		this.setupInterceptors();
 	}
 
-	private setupInterceptors(): void {
+	public setupInterceptors(token?: string): void {
 		// Request interceptor
 		this.client.interceptors.request.use(
 			(config) => {
 				// Add auth token if available
-				const token = this.getAuthToken();
 				if (token) {
 					config.headers.Authorization = `Bearer ${token}`;
 				}
@@ -86,9 +84,11 @@ export class HttpClient {
 	}
 
 	private handleUnauthorized(): void {
-		// Clear token and redirect to login
+		// Clear token but don't redirect automatically
+		// Let the UI handle the error gracefully
 		this.clearAuthToken();
-		window.location.href = "/auth/login";
+		console.warn("Authentication failed - token cleared");
+		// Don't redirect here - let the component handle it
 	}
 
 	private handleForbidden(): void {
@@ -107,18 +107,25 @@ export class HttpClient {
 	}
 
 	// Public methods for token management
-	public setAuthToken(token: string): void {
-		localStorage.setItem("auth_token", token);
-		this.client.defaults.headers.common.Authorization = `Bearer ${token}`;
+	public setAuthToken(accessToken: string, refreshToken?: string): void {
+		if (refreshToken) {
+			setLocalStorage(environment.AUTH.REFRESH_TOKEN_KEY, refreshToken);
+		}
+		this.client.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 	}
 
 	public clearAuthToken(): void {
-		localStorage.removeItem("auth_token");
+		localStorage.removeItem(environment.AUTH.TOKEN_KEY);
+		localStorage.removeItem(environment.AUTH.REFRESH_TOKEN_KEY);
 		this.client.defaults.headers.common.Authorization = "";
 	}
 
 	public getAuthToken(): string | null {
-		return localStorage.getItem("auth_token");
+		return localStorage.getItem(environment.AUTH.TOKEN_KEY);
+	}
+
+	public getRefreshToken(): string | null {
+		return localStorage.getItem(environment.AUTH.REFRESH_TOKEN_KEY);
 	}
 
 	// HTTP methods
@@ -127,9 +134,9 @@ export class HttpClient {
 		config?: AxiosRequestConfig,
 	): Promise<ApiResponse<T>> {
 		try {
-			const response = await this.client.get<T>(url, config);
+			const response = await this.client.get<{ data: T }>(url, config);
 			return {
-				data: response.data,
+				data: response.data.data,
 				status: response.status,
 				success: true,
 			};
@@ -144,9 +151,9 @@ export class HttpClient {
 		config?: AxiosRequestConfig,
 	): Promise<ApiResponse<T>> {
 		try {
-			const response = await this.client.post<T>(url, data, config);
+			const response = await this.client.post<{ data: T }>(url, data, config);
 			return {
-				data: response.data,
+				data: response.data.data,
 				status: response.status,
 				success: true,
 			};
@@ -161,9 +168,9 @@ export class HttpClient {
 		config?: AxiosRequestConfig,
 	): Promise<ApiResponse<T>> {
 		try {
-			const response = await this.client.put<T>(url, data, config);
+			const response = await this.client.put<{ data: T }>(url, data, config);
 			return {
-				data: response.data,
+				data: response.data.data,
 				status: response.status,
 				success: true,
 			};
@@ -178,9 +185,9 @@ export class HttpClient {
 		config?: AxiosRequestConfig,
 	): Promise<ApiResponse<T>> {
 		try {
-			const response = await this.client.patch<T>(url, data, config);
+			const response = await this.client.patch<{ data: T }>(url, data, config);
 			return {
-				data: response.data,
+				data: response.data.data,
 				status: response.status,
 				success: true,
 			};
@@ -194,9 +201,9 @@ export class HttpClient {
 		config?: AxiosRequestConfig,
 	): Promise<ApiResponse<T>> {
 		try {
-			const response = await this.client.delete<T>(url, config);
+			const response = await this.client.delete<{ data: T }>(url, config);
 			return {
-				data: response.data,
+				data: response.data.data,
 				status: response.status,
 				success: true,
 			};
