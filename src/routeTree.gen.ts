@@ -11,27 +11,33 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as IndexImport } from './routes/index'
-import { Route as ProtectedRegisterImport } from './routes/_protected/register'
-import { Route as ProtectedLoginImport } from './routes/_protected/login'
+import { Route as PublicRegisterImport } from './routes/_public/register'
+import { Route as PublicLoginImport } from './routes/_public/login'
+import { Route as ProtectedHomeImport } from './routes/_protected/home'
+import { Route as ProtectedLayoutImport } from './routes/_protected/_layout'
 
 // Create/Update Routes
 
-const IndexRoute = IndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const ProtectedRegisterRoute = ProtectedRegisterImport.update({
-  id: '/_protected/register',
+const PublicRegisterRoute = PublicRegisterImport.update({
+  id: '/_public/register',
   path: '/register',
   getParentRoute: () => rootRoute,
 } as any)
 
-const ProtectedLoginRoute = ProtectedLoginImport.update({
-  id: '/_protected/login',
+const PublicLoginRoute = PublicLoginImport.update({
+  id: '/_public/login',
   path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProtectedHomeRoute = ProtectedHomeImport.update({
+  id: '/_protected/home',
+  path: '/home',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProtectedLayoutRoute = ProtectedLayoutImport.update({
+  id: '/_protected/_layout',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -39,25 +45,32 @@ const ProtectedLoginRoute = ProtectedLoginImport.update({
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
+    '/_protected/_layout': {
+      id: '/_protected/_layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof ProtectedLayoutImport
       parentRoute: typeof rootRoute
     }
-    '/_protected/login': {
-      id: '/_protected/login'
+    '/_protected/home': {
+      id: '/_protected/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof ProtectedHomeImport
+      parentRoute: typeof rootRoute
+    }
+    '/_public/login': {
+      id: '/_public/login'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof ProtectedLoginImport
+      preLoaderRoute: typeof PublicLoginImport
       parentRoute: typeof rootRoute
     }
-    '/_protected/register': {
-      id: '/_protected/register'
+    '/_public/register': {
+      id: '/_public/register'
       path: '/register'
       fullPath: '/register'
-      preLoaderRoute: typeof ProtectedRegisterImport
+      preLoaderRoute: typeof PublicRegisterImport
       parentRoute: typeof rootRoute
     }
   }
@@ -66,43 +79,53 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/login': typeof ProtectedLoginRoute
-  '/register': typeof ProtectedRegisterRoute
+  '': typeof ProtectedLayoutRoute
+  '/home': typeof ProtectedHomeRoute
+  '/login': typeof PublicLoginRoute
+  '/register': typeof PublicRegisterRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/login': typeof ProtectedLoginRoute
-  '/register': typeof ProtectedRegisterRoute
+  '': typeof ProtectedLayoutRoute
+  '/home': typeof ProtectedHomeRoute
+  '/login': typeof PublicLoginRoute
+  '/register': typeof PublicRegisterRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/_protected/login': typeof ProtectedLoginRoute
-  '/_protected/register': typeof ProtectedRegisterRoute
+  '/_protected/_layout': typeof ProtectedLayoutRoute
+  '/_protected/home': typeof ProtectedHomeRoute
+  '/_public/login': typeof PublicLoginRoute
+  '/_public/register': typeof PublicRegisterRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register'
+  fullPaths: '' | '/home' | '/login' | '/register'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register'
-  id: '__root__' | '/' | '/_protected/login' | '/_protected/register'
+  to: '' | '/home' | '/login' | '/register'
+  id:
+    | '__root__'
+    | '/_protected/_layout'
+    | '/_protected/home'
+    | '/_public/login'
+    | '/_public/register'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ProtectedLoginRoute: typeof ProtectedLoginRoute
-  ProtectedRegisterRoute: typeof ProtectedRegisterRoute
+  ProtectedLayoutRoute: typeof ProtectedLayoutRoute
+  ProtectedHomeRoute: typeof ProtectedHomeRoute
+  PublicLoginRoute: typeof PublicLoginRoute
+  PublicRegisterRoute: typeof PublicRegisterRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  ProtectedLoginRoute: ProtectedLoginRoute,
-  ProtectedRegisterRoute: ProtectedRegisterRoute,
+  ProtectedLayoutRoute: ProtectedLayoutRoute,
+  ProtectedHomeRoute: ProtectedHomeRoute,
+  PublicLoginRoute: PublicLoginRoute,
+  PublicRegisterRoute: PublicRegisterRoute,
 }
 
 export const routeTree = rootRoute
@@ -115,19 +138,23 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
-        "/_protected/login",
-        "/_protected/register"
+        "/_protected/_layout",
+        "/_protected/home",
+        "/_public/login",
+        "/_public/register"
       ]
     },
-    "/": {
-      "filePath": "index.tsx"
+    "/_protected/_layout": {
+      "filePath": "_protected/_layout.tsx"
     },
-    "/_protected/login": {
-      "filePath": "_protected/login.tsx"
+    "/_protected/home": {
+      "filePath": "_protected/home.tsx"
     },
-    "/_protected/register": {
-      "filePath": "_protected/register.tsx"
+    "/_public/login": {
+      "filePath": "_public/login.tsx"
+    },
+    "/_public/register": {
+      "filePath": "_public/register.tsx"
     }
   }
 }
